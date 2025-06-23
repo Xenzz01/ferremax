@@ -1,15 +1,32 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Eliminar Producto</title>
-</head>
-<body>
-    <h1>Eliminar Producto</h1>
-    <p>¿Estás seguro de que deseas eliminar "{{ object.nombre }}"?</p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Eliminar</button>
-    </form>
-    <a href="{% url 'producto_list' %}">Cancelar</a>
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}Confirmar Eliminación – MiApp Profesional{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card border-danger shadow-sm">
+        <div class="card-header bg-danger text-white text-center">
+          <i class="bi bi-exclamation-triangle-fill display-1"></i>
+          <h4 class="mt-3 mb-0">Confirmar Eliminación</h4>
+        </div>
+        <div class="card-body text-center">
+          <p class="mb-4">
+            ¿Estás seguro de que deseas eliminar el producto 
+            <strong>"{{ object.nombre }}"</strong>?
+          </p>
+          <form method="post" class="d-inline-block">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger me-3 px-4">
+              <i class="bi bi-trash-fill me-1"></i>Eliminar
+            </button>
+          </form>
+          <a href="{% url 'producto_list' %}" class="btn btn-outline-secondary px-4">
+            <i class="bi bi-x-circle me-1"></i>Cancelar
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

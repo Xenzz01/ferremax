@@ -1,12 +1,36 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Pago Rechazado</title>
-</head>
-<body>
-    <h1>Pago Rechazado</h1>
-    <p>Tu pago no pudo ser procesado o fue rechazado por Webpay.</p>
-    <p>Por favor, intenta nuevamente o utiliza otro método de pago.</p>
-    <a href="{% url 'ver_carrito' %}">Volver al carro</a>
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pago Rechazado – MiApp Profesional{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+
+      <!-- Card de fallo de pago -->
+      <div class="card text-center shadow-sm border-danger">
+        <div class="card-body">
+          <i class="bi bi-x-circle-fill text-danger display-1 mb-3"></i>
+          <h1 class="card-title display-6 fw-bold">Pago Rechazado</h1>
+          <p class="card-text lead text-secondary mb-4">
+            Tu pago no pudo ser procesado o fue rechazado por Webpay.
+          </p>
+          <p class="text-muted mb-4">
+            Por favor, intenta nuevamente o utiliza otro método de pago.
+          </p>
+          <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'ver_carrito' %}" class="btn btn-outline-primary px-4">
+              <i class="bi bi-cart me-1"></i> Volver al carrito
+            </a>
+            <a href="{% url 'pagar' %}" class="btn btn-danger px-4">
+              <i class="bi bi-arrow-repeat me-1"></i> Reintentar pago
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

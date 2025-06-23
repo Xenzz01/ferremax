@@ -1,50 +1,61 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Lista de Productos</title>
+{% extends 'base.html' %}
+{% load static %}
 
-</head>
-<body>
-    <h1>Productos Disponibles</h1>
-    <ul>
-        {% for producto in productos %}
-            <li>
-                {{ producto.nombre }} - ${{ producto.precio }} - Stock: {{ producto.stock }}
-                {% if producto.stock > 0 %}
-                    <a href="{% url 'agregar_al_carrito' producto.id %}">Añadir al Carrito</a>
-                {% else %}
-                    <span style="color:gray;">Sin stock</span>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'ver_carrito' %}">Ver Carrito</a>
-    <pre>
-        ⊹⠀ ⠀  ⣀⣤⣤⣤⡀⣀⣤⣤⣤⣀ ⠀⠀⠀⠀⠀ ₊
-        ⠀⠀   ⣼⠋ ⠀⠀ ⠹⠋ ⠀⠀⠀⠙⣧
-        ⠀⠀   ⣿ ⠀⠀⠀⠀⠀⠀⠀⠀⠀  ⣿
-        ⣠⠶⠛⠻⣷⠞⠛⢶⡄ ⠀⠀⠀⠀⣼⠃
-        ⣿ ⠀⠀⠀⠀⠀ ⠀⣿ ⠀⠀ ⣠⠞⠁
-        ⠘⣧ ⠀⠀⠀⠀⠀⡼⣧⣴⠞
-        ⠀⠈⠻⣦⣀⡴⠟⠁ ⠀⠀⠀⠀⠀⊹
-        ₊⠀⠀⠀ ⠉
-    </pre>
-    {% if messages %}
-        <ul id="messages">
-            {% for message in messages %}
-                <li style="color:green;">{{ message }}</li>
-            {% endfor %}
-        </ul>
-        <script>
-            setTimeout(function() {
-                var msg = document.getElementById('messages');
-                if (msg) {
-                    msg.style.transition = "opacity 1s";
-                    msg.style.opacity = 0;
-                    setTimeout(function(){ msg.remove(); }, 1000);
-                }
-            }, 2000); // 3 segundos
-        </script>
-    {% endif %}
-</body>
-</html>
+{% block title %}Productos – MiApp Profesional{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="mb-4">Productos Disponibles</h1>
+
+  {# Mensajes flash #}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {# Grid responsive de tarjetas #}
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+    {% for producto in productos %}
+      <div class="col">
+        <div class="card h-100 shadow-sm">
+          {# Imagen de producto o placeholder #}
+          {% if producto.imagen_url %}
+            <img src="{{ producto.imagen_url }}" class="card-img-top" alt="{{ producto.nombre }}">
+          {% else %}
+            <img src="{% static 'img/placeholder.png' %}" class="card-img-top" alt="Imagen no disponible">
+          {% endif %}
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ producto.nombre }}</h5>
+            <p class="card-text mb-2"><strong>Precio:</strong> ${{ producto.precio }}</p>
+            <p class="card-text mb-3"><strong>Stock:</strong> {{ producto.stock }}</p>
+            {% if producto.stock > 0 %}
+              <a href="{% url 'agregar_al_carrito' producto.id %}" class="btn btn-primary mt-auto">
+                <i class="bi bi-cart-plus me-1"></i>Añadir al carrito
+              </a>
+            {% else %}
+              <button class="btn btn-secondary mt-auto" disabled>
+                Sin stock
+              </button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <p class="text-muted">No hay productos disponibles en este momento.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  {# Enlace al carrito #}
+  <div class="mt-4 text-end">
+    <a href="{% url 'ver_carrito' %}" class="btn btn-outline-primary">
+      <i class="bi bi-cart me-1"></i>Ver Carrito
+    </a>
+  </div>
+</div>
+{% endblock %}

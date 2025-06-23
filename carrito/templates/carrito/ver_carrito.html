@@ -1,51 +1,102 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Carrito de Compras</title>
-</head>
-<body>
-    <h1>Carrito de Compras</h1>
-    <ul>
-        {% for item in carrito %}
-            <li>
-                {{ item.producto.nombre }} - ${{ item.producto.precio }} x {{ item.cantidad }} = ${{ item.subtotal }}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Carrito de Compras – MiApp Profesional{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4">Tu Carrito de Compras</h1>
+
+  {% if carrito %}
+    <!-- Tabla de productos en el carrito -->
+    <div class="table-responsive mb-4">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Producto</th>
+            <th class="text-center">Precio Unitario</th>
+            <th class="text-center">Cantidad</th>
+            <th class="text-end">Subtotal</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in carrito %}
+          <tr>
+            <td>{{ item.producto.nombre }}</td>
+            <td class="text-center">${{ item.producto.precio }}</td>
+            <td class="text-center">{{ item.cantidad }}</td>
+            <td class="text-end">${{ item.subtotal }}</td>
+            <td class="text-center">
+              <!-- Formulario para eliminar cantidad o ítem -->
+              <form action="{% url 'eliminar_del_carrito' item.id %}" method="post" class="d-inline-flex align-items-center">
+                {% csrf_token %}
                 {% if item.cantidad > 1 %}
-                    <form action="{% url 'eliminar_del_carrito' item.id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <input type="number" name="cantidad" min="1" max="{{ item.cantidad }}" value="1" style="width:50px;">
-                        <button type="submit" style="color:red;">Eliminar cantidad</button>
-                    </form>
-                {% else %}
-                    <form action="{% url 'eliminar_del_carrito' item.id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" style="color:red;">Eliminar</button>
-                    </form>
+                  <input type="number" name="cantidad" min="1" max="{{ item.cantidad }}" value="1"
+                         class="form-control form-control-sm me-2" style="width: 5rem;">
                 {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-    <p>Total: ${{ total }}</p>
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                  <i class="bi bi-trash-fill"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-    <form method="get" style="margin-bottom: 10px;">
-        <button type="submit" name="convertir" value="dolar">Convertir a Dólar</button>
-        <button type="submit" name="convertir" value="euro">Convertir a Euro</button>
-    </form>
+    <!-- Total y conversión de moneda -->
+    <div class="row align-items-center mb-4">
+      <div class="col-md-6">
+        <h4>Total:</h4>
+        <h3 class="text-success">${{ total }}</h3>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <form method="get" class="d-inline-flex gap-2">
+          <button type="submit" name="convertir" value="dolar" class="btn btn-outline-secondary">
+            <i class="bi bi-currency-dollar"></i> USD
+          </button>
+          <button type="submit" name="convertir" value="euro" class="btn btn-outline-secondary">
+            <i class="bi bi-currency-euro"></i> EUR
+          </button>
+        </form>
+      </div>
+    </div>
 
+    <!-- Resultados de conversión -->
     {% if error_dolar %}
-        <p style="color:red;">{{ error_dolar }}</p>
+      <div class="alert alert-danger">{{ error_dolar }}</div>
     {% elif valor_dolar and total_usd %}
-        <p>Valor dólar hoy: ${{ valor_dolar|floatformat:2 }}</p>
-        <p>Total en dólares: ${{ total_usd|floatformat:2 }}</p>
+      <div class="alert alert-info">
+        <strong>1 USD = ${{ valor_dolar|floatformat:2 }}</strong><br>
+        Total en USD: <strong>${{ total_usd|floatformat:2 }}</strong>
+      </div>
     {% endif %}
 
     {% if error_euro %}
-        <p style="color:red;">{{ error_euro }}</p>
+      <div class="alert alert-danger">{{ error_euro }}</div>
     {% elif valor_euro and total_eur %}
-        <p>Valor euro hoy: ${{ valor_euro|floatformat:2 }}</p>
-        <p>Total en euros: €{{ total_eur|floatformat:2 }}</p>
+      <div class="alert alert-info">
+        <strong>1 EUR = ${{ valor_euro|floatformat:2 }}</strong><br>
+        Total en EUR: <strong>€{{ total_eur|floatformat:2 }}</strong>
+      </div>
     {% endif %}
 
-    <a href="{% url 'lista_productos' %}">Volver al listado de productos</a>
-    <a href="{% url 'pagar_webpay' %}">Pagar con Webpay</a>
-</body>
-</html>
+    <!-- Acciones finales -->
+    <div class="d-flex justify-content-between mt-4">
+      <a href="{% url 'lista_productos' %}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-1"></i> Seguir comprando
+      </a>
+      <a href="{% url 'pagar_webpay' %}" class="btn btn-success">
+        <i class="bi bi-credit-card-fill me-1"></i> Pagar con Webpay
+      </a>
+    </div>
+
+  {% else %}
+    <div class="alert alert-warning text-center">
+      Tu carrito está vacío. <a href="{% url 'lista_productos' %}">Ver productos</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
