@@ -1,0 +1,24 @@
+# Instrucciones para configurar el entorno y ejecutar FastAPI en el puerto 9000
+
+1. Abre una terminal en la carpeta del proyecto.
+
+2. Crea un entorno virtual (venv):
+  python -m venv venv
+
+3. Activa el entorno virtual:
+  - En Windows:
+    venv\Scripts\activate
+  - En macOS/Linux:
+    source venv/bin/activate
+
+4. Instala los paquetes necesarios desde requirements.txt:
+  pip install -r requirements.txt
+
+5. Ejecuta la aplicación FastAPI en el puerto 9000:
+  fastapi dev main.py --port 9000
+
+6. Abre tu navegador y accede a la documentación de la API en:
+  http://localhost:9000/docs
+
+7. Para detener el servidor, presiona Ctrl+C en la terminal.
+# Nota: Asegúrate de tener Python 3.8 o superior instalado en tu sistema.
