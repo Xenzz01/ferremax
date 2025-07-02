@@ -1,41 +1,38 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Producto
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from .serializers import ProductoSerializer
+from .forms import ProductoForm
 
-class ProductoListView(ListView):
-    model = Producto
-    template_name = 'inventario/producto_list.html'
+def producto_list(request):
+    productos = Producto.objects.all()
+    return render(request, 'inventario/producto_list.html', {'object_list': productos})
 
-class ProductoCreateView(CreateView):
-    model = Producto
-    fields = ['nombre', 'categoria', 'descripcion', 'precio', 'stock']
-    template_name = 'inventario/producto_form.html'
-    success_url = reverse_lazy('producto_list')
+def producto_create(request):
+    if request.method == 'POST':
+        form = ProductoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('producto_list')        # <-- aquí rediriges
+    else:
+        form = ProductoForm()
+    return render(request, 'inventario/producto_form.html', {'form': form})
 
-class ProductoUpdateView(UpdateView):
-    model = Producto
-    fields = ['nombre', 'categoria', 'descripcion', 'precio', 'stock']
-    template_name = 'inventario/producto_form.html'
-    success_url = reverse_lazy('producto_list')
+def producto_update(request, pk):
+    producto = get_object_or_404(Producto, pk=pk)
+    if request.method == 'POST':
+        form = ProductoForm(request.POST, instance=producto)
+        if form.is_valid():
+            form.save()
+            return redirect('producto_list')        # <-- y aquí también
+    else:
+        form = ProductoForm(instance=producto)
+    return render(request, 'inventario/producto_form.html', {
+        'form': form,
+        'object': producto
+    })
 
-class ProductoDeleteView(DeleteView):
-    model = Producto
-    template_name = 'inventario/producto_confirm_delete.html'
-    success_url = reverse_lazy('producto_list')
-
-class ProductoListAPIView(APIView):
-    def get(self, request):
-        productos = Producto.objects.all()
-        serializer = ProductoSerializer(productos, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-class ProductoDetailAPIView(APIView):
-    def get(self, request, pk):
-        producto = get_object_or_404(Producto, pk=pk)
-        serializer = ProductoSerializer(producto)
-        return Response(serializer.data)
+def producto_delete(request, pk):
+    producto = get_object_or_404(Producto, pk=pk)
+    if request.method == 'POST':
+        producto.delete()
+        return redirect('producto_list')
+    return render(request, 'inventario/producto_confirm_delete.html', {'object': producto})
